@@ -1,0 +1,129 @@
+# Task class to hold task details
+class Task:
+    def __init__(t, title, duration, priority):
+        t.title = title
+        t.duration = duration
+        t.priority = priority
+
+# Queue class to manage tasks
+class TaskQueue:
+    def __init__(t):
+        t.tasks = []
+
+    def insert(t, task):
+        t.tasks.append(task)
+
+    def extract(t):
+        if not t.tasks:
+            return None
+        
+        # Find task with highest priority (lowest number)
+        highest_priority_task = t.tasks[0]
+        for task in t.tasks:
+            if task.priority < highest_priority_task.priority:
+                highest_priority_task = task
+        
+        t.tasks.remove(highest_priority_task)
+        return highest_priority_task
+
+    def peek(t):
+        if not t.tasks:
+            return None
+        
+        # Find task with highest priority (lowest number)
+        highest_priority_task = t.tasks[0]
+        for task in t.tasks:
+            if task.priority < highest_priority_task.priority:
+                highest_priority_task = task
+        
+        return highest_priority_task
+
+    def is_empty(t):
+        return len(t.tasks) == 0
+
+# Function to complete the next task
+def complete_next_task(queue):
+    task = queue.extract()
+    if task:
+        print("Completing task: {task.title} (Duration: {task.duration} mins, Priority: {task.priority})")
+    else:
+        print("No tasks available to complete.")
+
+# Function to compare tasks for sorting
+def compare_duration(task1, task2):
+    return task1.duration - task2.duration
+
+# Function to search for a task by title
+def search_for_task(queue, title):
+    # First make a copy of tasks and sort them by title
+    tasks_copy = queue.tasks.copy()
+    
+    # Simple bubble sort by title
+    n = len(tasks_copy)
+    for i in range(n):
+        for j in range(0, n-i-1):
+            if tasks_copy[j].title > tasks_copy[j+1].title:
+                tasks_copy[j], tasks_copy[j+1] = tasks_copy[j+1], tasks_copy[j]
+    
+    # Binary search implementation
+    left = 0
+    right = len(tasks_copy) - 1
+    
+    while left <= right:
+        mid = (left + right) // 2
+        if tasks_copy[mid].title == title:
+            return tasks_copy[mid]
+        elif tasks_copy[mid].title < title:
+            left = mid + 1
+        else:
+            right = mid - 1
+    
+    return None
+
+# Function to sort tasks by duration
+def sort_tasks(queue):
+    # Simple bubble sort implementation
+    tasks_copy = queue.tasks.copy()
+    n = len(tasks_copy)
+    
+    for i in range(n):
+        for j in range(0, n-i-1):
+            if tasks_copy[j].duration > tasks_copy[j+1].duration:
+                tasks_copy[j], tasks_copy[j+1] = tasks_copy[j+1], tasks_copy[j]
+    
+    return tasks_copy
+
+# Main program
+def main():
+    num_tasks = int(input("Enter the number of tasks: "))
+    task_queue = TaskQueue()
+
+    for i in range(num_tasks):
+        print("\nTask {i+1}:")
+        title = input("Enter task title: ")
+        duration = int(input("Enter task duration (in mins): "))
+        priority = int(input("Enter task priority (lower value = higher priority): "))
+        task = Task(title, duration, priority)
+        task_queue.insert(task)
+
+    # Complete the next task
+    print("\nCompleting the next task:")
+    complete_next_task(task_queue)
+
+    # Search for a task
+    search_title = input("\nEnter the title of the task to search for: ")
+    found_task = search_for_task(task_queue, search_title)
+    if found_task:
+        print("Task found: {found_task.title} (Duration: {found_task.duration} mins, Priority: {found_task.priority})")
+    else:
+        print("Task not found.")
+
+    # Sort tasks by duration
+    print("\nTasks sorted by duration (ascending):")
+    sorted_tasks = sort_tasks(task_queue)
+    for task in sorted_tasks:
+        print("{task.title}: {task.duration} mins (Priority: {task.priority})")
+
+# Run the program
+if __name__ == "__main__":
+    main()
